@@ -1,0 +1,18 @@
+.container {
+    display: flex;
+    flex-direction: wrap;
+}
+
+button {
+    background: steelblue;
+    border: none;
+    border-radius: 10px;
+    margin-left: 10px;
+    height: 30px;
+    width: 100px;
+}
+
+button a {
+    color: #fff;
+    text-decoration: none;
+}
