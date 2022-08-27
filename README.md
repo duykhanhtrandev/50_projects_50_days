@@ -1,1 +1,1 @@
-https://duykhanhtrandev.github.io/50_projects_50_days/
+My site is live at https://duykhanhtrandev.github.io/practice-everyday-projects/
