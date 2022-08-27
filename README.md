@@ -1,1 +1,1 @@
-My site is live at https://duykhanhtrandev.github.io/practice-everyday-projects/
+My site is live at https://duykhanhtrandev.github.io/everyday-projects/
