@@ -23,7 +23,16 @@ function Validator(options) {
         // Lap qua tung rule & kiem tra
         // Neu co loi thi dung kiem tra
         for (var i = 0; i < rules.length; ++i) {
-            errorMessage = rules[i](inputElement.value);
+            switch (inputElement.type) {
+                case 'radio':
+                case 'checkbox':
+                    errorMessage = rules[i](
+                        formElement.querySelector(rule.selector + ':checked')
+                    );
+                    break;
+                default:
+                    errorMessage = rules[i](inputElement.value);
+            }
             if (errorMessage) break;
         }
 
@@ -62,7 +71,28 @@ function Validator(options) {
                 if (typeof options.onSubmit === 'function') {
                     var enableInputs = formElement.querySelectorAll('[name]');
                     var formValues = Array.from(enableInputs).reduce((values, input) => {
-                        values[input.name] = input.value;
+                        
+                        switch(input.type) {
+                            case 'radio':
+                                values[input.name] = formElement.querySelector('input[name="' + input.name + '"]:checked').value;
+                                break;
+                            case 'checkbox':
+                                if (!input.matches(':checked')) {
+                                    values[input.name] = [];
+                                    return values;
+                                }
+                                if (!Array.isArray(values[input.name])) {
+                                    values[input.name] = [];
+                                }
+                                values[input.name].push(input.value)
+                                break;
+                            case 'file':
+                                values[input.name] = input.files;
+                                break;
+                            default:
+                                values[input.name] = input.value;
+                        }
+
                         return values;
                     }, {});
 
@@ -85,18 +115,19 @@ function Validator(options) {
                 selectorRules[rule.selector] = [rule.test];
             }
 
-            var inputElement = formElement.querySelector(rule.selector);
-            if (inputElement) {
+            var inputElements = formElement.querySelectorAll(rule.selector);
+
+            Array.from(inputElements).forEach(inputElement => {
                 // Xu ly truong hop blur khoi input
                 inputElement.onblur = () => validate(inputElement, rule);
 
                 // Xu ly moi khi nguoi dung nhap vao input
                 inputElement.oninput = () => {
-                    var errorElement = inputElement.parentElement.querySelector(options.errorSelector);
+                    var errorElement = getParent(inputElement, options.formGroupSelector).querySelector(options.errorSelector);
                     errorElement.innerText = '';
                     inputElement.parentElement.classList.remove('invalid');
                 }
-            }
+            });
         });
     }
 }
@@ -109,7 +140,7 @@ function Validator(options) {
 Validator.isRequired = (selector, message) => {
     return {
         selector,
-        test: value => value.trim() ? undefined : message || 'Vui lòng nhập trường này!' // method Trim loại bỏ các dấu cách
+        test: value => value ? undefined : message || 'Vui lòng nhập trường này!' // method Trim loại bỏ các dấu cách
     }
 }
 
